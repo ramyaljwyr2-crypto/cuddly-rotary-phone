@@ -29,16 +29,16 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: ./
+        working-directory: .
 
       - name: Build Web
-        run: flutter build web --release --base-href /
-        working-directory: ./
+        run: flutter build web --release --base-href /cuddly-rotary-phone/
+        working-directory: .
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/web
+          path: ./build/web
 
   deploy:
     environment:
