@@ -4,195 +4,144 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الخضرانية لخدمات الإنترنت</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root {
+  --bg1: #0a0a0a;
+  --bg2: #1a1a1a;
+  --card: #222;
+  --text: #eee;
+  --input: #333;
+  --border: #444;
+  --accent: #4a90e2;
+}
+
+body.light {
+  --bg1: #e0e0e0;
+  --bg2: #f5f5f5;
+  --card: #fff;
+  --text: #111;
+  --input: #f0f0f0;
+  --border: #ddd;
+  --accent: #0077ff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo', sans-serif; }
 body {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-    color: #fff;
-    overflow: hidden;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: 0.4s;
+  color: var(--text);
 }
-.screen {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: opacity 0.5s;
-}
-.hidden { opacity: 0; pointer-events: none; }
-
-/* Splash Screen */
-#splash h1 {
-    font-size: 32px;
-    color: #007bff;
-    margin-top: 20px;
-    text-align: center;
-}
-.logo {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 50px;
-    box-shadow: 0 10px 40px rgba(0, 123, 255, 0.4);
-}
-
-/* Contact Screen */
-#contact {
-    text-align: center;
-}
-#contact h2 { color: #007bff; margin-bottom: 15px; font-size: 24px; }
-#contact p { margin: 8px 0; font-size: 16px; color: #ccc; }
-#contact .phone { font-size: 20px; color: #fff; font-weight: bold; }
-.btn {
-    display: block;
-    width: 250px;
-    padding: 14px;
-    margin: 12px auto;
-    border-radius: 10px;
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    font-size: 17px;
-    transition: 0.3s;
-}
-.btn-whatsapp { background: #25D366; }
-.btn-telegram { background: #0088cc; }
-.btn-login { background: linear-gradient(90deg, #007bff, #0056b3); }
-.btn:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4); }
-
-/* Login Screen */
 .login-box {
-    background: #111;
-    padding: 35px 25px;
-    border-radius: 15px;
-    border: 1px solid #007bff;
-    width: 100%;
-    max-width: 360px;
+  background: var(--card);
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  transition: 0.4s;
 }
-.login-box h2 { color: #007bff; text-align: center; margin-bottom: 25px; }
+.login-box h2 {
+  margin-bottom: 25px;
+  color: var(--accent);
+}
 .login-box input {
-    width: 100%;
-    padding: 13px;
-    margin-bottom: 15px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 16px;
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--input);
+  color: var(--text);
+  outline: none;
+  font-size: 16px;
+  transition: 0.3s;
+}
+.login-box input:focus {
+  border-color: var(--accent);
 }
 .login-box button {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(90deg, #007bff, #0056b3);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.3s;
 }
-.accounts {
-    margin-top: 20px;
-    font-size: 13px;
-    color: #aaa;
-    line-height: 1.8;
+.login-box button:hover {
+  opacity: 0.9;
 }
-footer {
-    position: absolute;
-    bottom: 15px;
-    text-align: center;
-    font-size: 12px;
-    color: #666;
+.theme-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.error {
+  color: #ff5555;
+  font-size: 14px;
+  margin-top: 10px;
+  display: none;
 }
 </style>
 </head>
 <body>
+<button class="theme-btn" onclick="toggleTheme()">🌙/☀️</button>
 
-<!-- 1. شاشة البداية Splash -->
-<div id="splash" class="screen">
-    <div class="logo">🌐</div>
-    <h1>الخضرانية<br>لخدمات الإنترنت</h1>
-</div>
-
-<!-- 2. شاشة قبل تسجيل الدخول -->
-<div id="contact" class="screen hidden">
-    <h2>الخضرانية لخدمات الإنترنت</h2>
-    <p>لتفعيل التطبيق أو الاستفسار يرجى مراسلة المطور:</p>
-    <p style="font-size: 20px; color: #007bff; margin: 10px 0;">رامي الجوير</p>
-    <p>رقم الهاتف:</p>
-    <p class="phone">07721701620</p>
-    
-    <a href="https://wa.me/9647721701620" class="btn btn-whatsapp" target="_blank">1- واتساب</a>
-    <a href="https://t.me/j1_ra_2" class="btn btn-telegram" target="_blank">2- تيليجرام: j1_ra_2</a>
-    
-    <button onclick="showLogin()" class="btn btn-login">المتابعة لتسجيل الدخول</button>
-</div>
-
-<!-- 3. شاشة تسجيل الدخول -->
-<div id="login" class="screen hidden">
-    <div class="login-box">
-        <h2>تسجيل الدخول</h2>
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="اسم المستخدم" required>
-            <input type="password" id="password" placeholder="كلمة المرور" required>
-            <button type="submit">تسجيل الدخول</button>
-        </form>
-        
-        <div class="accounts">
-            <b>أنواع الحسابات:</b><br>
-            1- المدير Admin<br>
-            اليوزر: admin | الباس: 1234<br>
-            2- الوكيل Agent<br>
-            يتم إنشاؤه من قبل المدير<br>
-            3- المشترك Customer<br>
-            يتم إنشاؤه من قبل المدير أو الوكيل
-        </div>
-    </div>
-    
-    <footer>
-        جميع الحقوق محفوظة<br>
-        الخضرانية لخدمات الإنترنت<br>
-        تطوير: رامي الجوير
-    </footer>
+<div class="login-box">
+  <h2>تسجيل الدخول</h2>
+  <input type="email" id="email" placeholder="الإيميل">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <button onclick="login()">دخول</button>
+  <div class="error" id="error"></div>
 </div>
 
 <script>
-// شاشة البداية 3 ثواني وبعدها تروح للاتصال
-setTimeout(() => {
-    document.getElementById('splash').classList.add('hidden');
-    document.getElementById('contact').classList.remove('hidden');
-}, 3000);
+// حط مفاتيح Supabase مالك هنا بعدين
+const SUPABASE_URL = 'https://xxxx.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// دالة اظهار تسجيل الدخول
-function showLogin() {
-    document.getElementById('contact').classList.add('hidden');
-    document.getElementById('login').classList.remove('hidden');
+// تبديل الثيم وحفظه
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+if(localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
 }
 
-// كود تسجيل الدخول المؤقت
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    let user = document.getElementById('username').value;
-    let pass = document.getElementById('password').value;
-    
-    if(user === 'admin' && pass === '1234') {
-        alert('تم تسجيل الدخول بنجاح - المدير');
-        // هنا حط الرابط مال لوحة التحكم
-        // window.location.href = 'dashboard.html';
-    } else {
-        alert('اسم المستخدم او كلمة المرور غلط');
-    }
-});
-</script>
+// تسجيل الدخول
+async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorDiv = document.getElementById('error');
+  errorDiv.style.display = 'none';
 
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  
+  if(error) {
+    errorDiv.innerText = 'الإيميل أو كلمة المرور غلط';
+    errorDiv.style.display = 'block';
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+</script>
 </body>
 </html>
