@@ -4,134 +4,239 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة التحكم - الخضرانية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
-:root{--bg:#0a0a0a;--box:#1a1a2e;--text:#fff;--border:#007bff;--btn:#007bff}
-body.light{--bg:#f5f5f5;--box:#fff;--text:#000;--border:#007bff;--btn:#007bff}
+:root{--bg:#0a0a0a;--box:#1a1a1a;--text:#fff;--text-muted:#ccc;--border:#007bff;--card-shadow:rgba(0,123,255,0.3)}
+body.white-mode{--bg:#f8f9fa;--box:#fff;--text:#000;--text-muted:#333;--border:#007bff;--card-shadow:rgba(0,0,0,0.1)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma;background:var(--bg);color:var(--text);padding:20px;transition:0.3s}
+body{font-family:'Cairo',Tahoma;background:var(--bg);color:var(--text);padding:20px;transition:0.3s}
 
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:10px}
-.header h1{color:var(--border)}
-.theme-btn{background:var(--btn);border:none;padding:10px 20px;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold}
-.logout-btn{background:#dc3545;border:none;padding:10px 20px;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px;padding:20px;background:var(--box);border:2px solid var(--border);border-radius:15px}
+.top-bar h2{color:#00aaff;font-size:22px;font-weight:700}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.btn-pdf{background:linear-gradient(135deg,#ff0000,#cc0000);border:none;padding:20px 40px;border-radius:15px;color:#fff;cursor:pointer;font-weight:700;font-size:22px;box-shadow:0 0 25px rgba(255,0,0,0.6);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 
-/* المربعات ال4 */
-.card{background:var(--box);border:2px solid var(--border);border-radius:15px;padding:25px;text-align:center;transition:0.3s}
-.card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,123,255,0.3)}
-.card h3{color:var(--border);margin-bottom:15px;font-size:22px}
-.card p{color:#aaa;margin-bottom:20px;font-size:14px}
-.card button{width:100%;padding:12px;background:var(--btn);border:none;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold;font-size:16px}
+.btn-theme{background:linear-gradient(135deg,#666,#444);border:none;padding:18px 30px;border-radius:12px;color:var(--text);cursor:pointer;font-weight:600;font-size:18px}
+body.white-mode .btn-theme{background:linear-gradient(135deg,#e0e0e0,#ccc);color:#000}
 
-/* صندوق Ping */
-.ping-box{display:flex;gap:10px;margin-top:15px}
-.ping-box input{flex:1;padding:10px;background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text)}
-.ping-box button{width:auto;padding:10px 20px}
-#pingResult{margin-top:10px;font-size:14px;min-height:20px}
+.btn-settings{background:linear-gradient(135deg,#6c757d,#495057);border:none;padding:18px 30px;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;font-size:18px}
+body.white-mode .btn-settings{background:linear-gradient(135deg,#dee2e6,#ced4da);color:#000}
 
-/* الخلفية الحية */
-.gear{position:fixed;border:5px solid var(--border);border-radius:50%;border-top-color:transparent;animation:spin linear infinite;opacity:0.1;z-index:-1}
-@keyframes spin{to{transform:rotate(360deg)}}
-.gear1{width:120px;height:120px;top:5%;right:5%;animation-duration:10s}
-.gear2{width:80px;height:80px;bottom:10%;left:5%;animation-duration:15s;animation-direction:reverse}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap}
+.btn{background:#007bff;border:none;padding:12px 20px;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;font-size:15px}
+.btn.danger{background:#dc3545}
+
+.role-badge{position:fixed;top:20px;left:20px;background:#28a745;padding:10px 18px;border-radius:10px;font-size:15px;font-weight:700;z-index:100;color:#fff}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px}
+.card{background:var(--box);border:2px solid var(--border);border-radius:20px;padding:30px;text-align:center;box-shadow:0 0 20px var(--card-shadow)}
+.card h3{color:#00aaff;margin-bottom:15px;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
+.card p{color:var(--text-muted);margin-bottom:25px;font-size:16px;font-weight:500}
+.counter{font-size:42px;font-weight:700;color:#00ff88;margin:15px 0}
+
+.live-dot{width:12px;height:12px;background:#ff0000;border-radius:50%;display:inline-block;animation:blink 1s infinite}
+@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
+
+.live-screen{background:#000;border:3px solid #00ff00;border-radius:15px;padding:20px;margin-top:20px;min-height:300px}
+body.white-mode .live-screen{background:#f0f0f0;border-color:#00aa00}
+.live-screen h3{color:#00ff00;margin-bottom:15px;text-align:center;font-weight:700}
+body.white-mode .live-screen h3{color:#008800}
+.device-item{padding:10px;background:#0a0a0a;margin:8px 0;border-radius:8px;border-left:4px solid #00ff00;display:flex;justify-content:space-between;color:var(--text);font-weight:600}
+body.white-mode .device-item{background:#e8e8e8}
+
+.settings-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:2000;justify-content:center;align-items:center}
+.settings-content{background:var(--box);padding:35px;border-radius:20px;border:2px solid var(--border);width:90%;max-width:550px}
+.settings-content h2{color:#00aaff;margin-bottom:25px;text-align:center;font-weight:700;font-size:26px}
+.setting-item{margin-bottom:25px;padding:20px;background:rgba(0,123,255,0.1);border-radius:12px;border:1px solid var(--border)}
+.setting-item h4{color:var(--text);margin-bottom:12px;font-weight:700;font-size:18px}
+.setting-item input{width:100%;padding:14px;margin:8px 0;background:var(--bg);border:2px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;font-weight:500}
+.setting-item button{width:100%;padding:14px;background:#007bff;border:none;border-radius:10px;color:#fff;cursor:pointer;font-weight:700;font-size:16px;margin-top:8px}
 </style>
 </head>
 <body>
 
-<div class="gear gear1"></div>
-<div class="gear gear2"></div>
+<div id="roleBadge" class="role-badge">🔒 حساب معزول</div>
 
-<div class="header">
-<h1>لوحة تحكم الخضرانية</h1>
-<div>
-<button class="theme-btn" onclick="toggleTheme()">🌙 ليلي</button>
-<button class="logout-btn" onclick="logout()">تسجيل خروج</button>
+<div class="top-bar">
+<h2>📊 لوحة تحكمي - الخضرانية</h2>
+<button class="btn-pdf" onclick="downloadPDFDirect()">📄 لطبع بياناتي اضغط هنا</button>
+<div class="btn-group">
+<button class="btn-settings" onclick="openSettings()">⚙️ الخيارات</button>
+<button class="btn-theme" id="themeBtn" onclick="toggleTheme()">🌙 رمادي</button>
+<button class="btn danger" onclick="logout()">تسجيل خروج</button>
 </div>
 </div>
 
 <div class="grid">
-<!-- 1. الاجهزة المتصلة -->
 <div class="card">
-<h3>📡 الاجهزة المتصلة</h3>
-<p>عرض جميع الاجهزة المتصلة حالياً بالشبكة</p>
-<button onclick="alert('قريباً: جلب الاجهزة من السيرفر')">عرض الاجهزة</button>
+<h3>👥 مشتركيني</h3>
+<div class="counter" id="subscribers-count">0</div>
+<p>بياناتك فقط - محد يشوفها غيرك 🔒</p>
 </div>
 
-<!-- 2. الاجهزة الطافية -->
 <div class="card">
-<h3>🔴 الاجهزة الطافية</h3>
-<p>عرض الاجهزة المقطوعة او غير المتصلة</p>
-<button onclick="alert('قريباً: جلب الاجهزة الطافية')">عرض الاجهزة</button>
+<h3>🔴 الطافين <span class="live-dot"></span></h3>
+<div class="counter" id="offline-count">0</div>
+<p>اجهزتك الطافية فقط</p>
 </div>
 
-<!-- 3. عمل Ping مع تغيير IP -->
 <div class="card">
-<h3>📶 عمل Ping</h3>
-<p>فحص الاتصال باي IP تختاره</p>
-<div class="ping-box">
-<input type="text" id="pingIP" value="8.8.8.8" placeholder="ادخل IP">
-<button onclick="doPing()">Ping</button>
+<h3>📶 المتصلين 📡</h3>
+<div class="counter" id="online-count">0</div>
+<p>اجهزتك المتصلة فقط</p>
 </div>
-<div id="pingResult"></div>
 </div>
 
-<!-- 4. فحص الشبكة fast.com -->
-<div class="card">
-<h3>🚀 فحص الشبكة</h3>
-<p>قياس سرعة الانترنت من موقع Netflix</p>
-<button onclick="window.open('https://fast.com','_blank')">فحص السرعة</button>
+<div class="live-screen">
+<h3>📺 الشاشة الحية</h3>
+<div id="liveDevices">
+<p style="text-align:center;color:var(--text-muted)">جاري التحميل...</p>
+</div>
+</div>
+
+<div class="settings-modal" id="settingsModal">
+<div class="settings-content">
+<h2>⚙️ اعدادات حسابي</h2>
+
+<div class="setting-item">
+<h4>🔐 تغير كلمة المرور</h4>
+<input type="password" id="oldPass" placeholder="كلمة المرور الحالية">
+<input type="password" id="newPass" placeholder="كلمة المرور الجديدة">
+<input type="password" id="confirmPass" placeholder="تأكيد كلمة المرور">
+<button onclick="changePassword()">تغير الباسورد</button>
+</div>
+
+<div class="setting-item">
+<h4>📧 ايميلي للنسخ الاحتياطي</h4>
+<input type="email" id="backupEmail" placeholder="ادخل ايميلك">
+<button onclick="saveBackupEmail()">حفظ الايميل</button>
+</div>
+
+<button class="btn danger" onclick="closeSettings()" style="margin-top:15px">اغلاق</button>
 </div>
 </div>
 
 <script>
+const { jsPDF } = window.jspdf
 const SUPABASE_URL = 'https://jrgfhtwhdlerzpbfstok.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_tbFu2PoX75gcrv82YjYCtw_AonRDoPM'
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// تحقق الدخول
-supabase.auth.getSession().then(({data:{session}})=>{
-if(!session) window.location.href='index.html'
+let currentUser = null
+let subscribersData = []
+
+supabase.auth.getUser().then(async ({data:{user}})=>{
+if(!user) return window.location.href='index.html'
+currentUser = user
+
+// تحميل الايميل المحفوظ
+const savedEmail = localStorage.getItem('backupEmail')
+if(savedEmail) document.getElementById('backupEmail').value = savedEmail
+
+loadData()
+setInterval(loadLiveDevices, 5000)
+
+const savedTheme = localStorage.getItem('appTheme')
+if(savedTheme=='white'){
+document.body.classList.add('white-mode')
+document.getElementById('themeBtn').textContent = '☀️ ابيض'
+}
 })
 
-// زر الوضع النهاري/اللي
-function toggleTheme(){
-document.body.classList.toggle('light')
-const btn = document.querySelector('.theme-btn')
-btn.textContent = document.body.classList.contains('light') ? '☀️ نهاري' : '🌙 ليلي'
-localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark')
-}
-if(localStorage.getItem('theme')==='light') {
-document.body.classList.add('light')
-document.querySelector('.theme-btn').textContent='☀️ نهاري'
+// عزل تام - كل واحد يشوف بس ماله
+async function loadData(){
+const {data} = await supabase.from('subscribers')
+.select('*')
+.eq('user_id', currentUser.id)
+.order('created_at',{ascending:false})
+
+subscribersData = data || []
+document.getElementById('subscribers-count').textContent = data.length
+loadLiveDevices()
 }
 
-// تسجيل الخروج
+async function loadLiveDevices(){
+const {data} = await supabase.from('devices')
+.select('*')
+.eq('user_id', currentUser.id)
+
+const liveDiv = document.getElementById('liveDevices')
+if(!data || data.length==0){
+liveDiv.innerHTML = '<p style="text-align:center;color:var(--text-muted)">لا توجد اجهزة</p>'
+return
+}
+document.getElementById('online-count').textContent = data.filter(d=>d.status=='online').length
+document.getElementById('offline-count').textContent = data.filter(d=>d.status=='offline').length
+liveDiv.innerHTML = ''
+data.forEach(device=>{
+liveDiv.innerHTML += `<div class="device-item ${device.status=='offline' ? 'offline' : ''}"><span>${device.name}</span><span>${device.status=='online' ? '🟢 متصل' : '🔴 طافي'}</span></div>`
+})
+}
+
+function toggleTheme(){
+document.body.classList.toggle('white-mode')
+const btn = document.getElementById('themeBtn')
+if(document.body.classList.contains('white-mode')){
+btn.textContent = '☀️ ابيض'
+localStorage.setItem('appTheme','white')
+}else{
+btn.textContent = '🌙 رمادي'
+localStorage.setItem('appTheme','gray')
+}
+}
+
+function openSettings(){document.getElementById('settingsModal').style.display='flex'}
+function closeSettings(){document.getElementById('settingsModal').style.display='none'}
+
+async function changePassword(){
+const newPass = document.getElementById('newPass').value
+const confirmPass = document.getElementById('confirmPass').value
+if(newPass.length < 6){alert('الباسورد 6 احرف اقل شي');return}
+if(newPass != confirmPass){alert('الباسورد غير متطابق');return}
+const {error} = await supabase.auth.updateUser({password: newPass})
+if(error){alert('خطأ: '+error.message)}else{alert('✅ تم التغير');closeSettings()}
+}
+
+function saveBackupEmail(){
+const email = document.getElementById('backupEmail').value
+if(!email.includes('@')){alert('ايميل خطأ');return}
+localStorage.setItem('backupEmail', email)
+alert('✅ تم الحفظ: '+email)
+}
+
+// PDF يدعم اكثر من 20 ورقة
+async function downloadPDFDirect(){
+if(subscribersData.length==0){alert('لا توجد بيانات');return}
+const doc = new jsPDF('p','mm','a4')
+const pageWidth = doc.internal.pageSize.getWidth()
+
+doc.setFontSize(20)
+doc.text('تقرير مشتركيني - الخضرانية', pageWidth/2, 20, {align:'center'})
+doc.setFontSize(12)
+doc.text('التاريخ: '+new Date().toLocaleDateString('ar-IQ'), 20, 32)
+doc.text('عدد السجلات: '+subscribersData.length, 20, 40)
+
+doc.autoTable({
+startY: 50,
+head: [['م', 'الاسم', 'الهاتف', 'العنوان', 'الحالة', 'التاريخ']],
+body: subscribersData.map((s,i)=>[i+1, s.name, s.phone, s.address || '-', s.status=='active' ? 'نشط' : 'منتهي', new Date(s.created_at).toLocaleDateString('ar-IQ')]),
+theme: 'grid',
+styles: {fontSize: 10, cellPadding: 3, halign: 'center'},
+headStyles: {fillColor: [0, 123, 255], textColor: 255, fontSize: 11, fontStyle: 'bold'},
+alternateRowStyles: {fillColor: [248, 249, 250]},
+margin: {left: 12, right: 12}
+})
+
+doc.save(`تقريري_${Date.now()}.pdf`)
+}
+
 async function logout(){
 await supabase.auth.signOut()
 window.location.href='index.html'
-}
-
-// دالة Ping محاكاة - لان المتصفح مايكدر يسوي ping حقي
-function doPing(){
-const ip = document.getElementById('pingIP').value
-const result = document.getElementById('pingResult')
-
-if(!ip){
-result.style.color='#ff6b6b'
-result.textContent='رجاءً ادخل IP'
-return
-}
-
-result.style.color='#aaa'
-result.textContent='جاري الفحص...'
-
-setTimeout(()=>{
-const time = Math.floor(Math.random() * 100) + 10
-result.style.color='#6bff6b'
-result.textContent=`✓ الرد من ${ip}: الوقت = ${time}ms TTL=64`
-},1000)
 }
 </script>
 </body>
