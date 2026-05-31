@@ -25,6 +25,7 @@
         h2 {
             text-align: center;
             color: #667eea;
+            margin-bottom: 20px;
         }
         input {
             width: 100%;
@@ -33,6 +34,11 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
         }
         button {
             width: 100%;
@@ -43,6 +49,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
         }
         button:hover {
             background: #764ba2;
@@ -72,10 +79,19 @@
             var p = document.getElementById('pass').value;
             if(u == 'admin' && p == '1234') {
                 alert('مرحبا بك! الموقع اشتغل بنجاح ✅');
+                // هنا تكدر تضيف تحويل لصفحة ثانية
+                // window.location.href = 'home.html';
             } else {
                 alert('خطأ في اسم المستخدم او كلمة السر');
             }
         }
+        
+        // دخول عند الضغط على Enter
+        document.addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') {
+                login();
+            }
+        });
     </script>
 </body>
 </html>
