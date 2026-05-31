@@ -8,43 +8,78 @@
 <style>
 :root {
   --bg1: #0a0a0a;
-  --bg2: #1a1a1a;
-  --card: #222;
+  --bg2: #181818;
+  --card: rgba(34,34,34,0.85);
   --text: #eee;
-  --input: #333;
+  --input: rgba(42,42,42,0.9);
   --border: #444;
   --accent: #4a90e2;
+  --muted: #aaa;
 }
 
 body.light {
-  --bg1: #e0e0e0;
-  --bg2: #f5f5f5;
-  --card: #fff;
+  --bg1: #f0f2f5;
+  --bg2: #ffffff;
+  --card: rgba(255,255,255,0.9);
   --text: #111;
-  --input: #f0f0f0;
+  --input: rgba(245,245,245,0.9);
   --border: #ddd;
   --accent: #0077ff;
+  --muted: #666;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo', sans-serif; }
 body {
-  background: linear-gradient(135deg, var(--bg1), var(--bg2));
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition: 0.4s;
   color: var(--text);
+  overflow: hidden;
+  position: relative;
 }
+
+/* الخلفية الحية بعجلات الضبط */
+.gears {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  overflow: hidden;
+}
+.gear {
+  position: absolute;
+  font-size: 60px;
+  color: var(--accent);
+  opacity: 0.15;
+  animation: rotate 20s linear infinite;
+}
+.gear:nth-child(2) { animation-duration: 25s; animation-direction: reverse; }
+.gear:nth-child(3) { animation-duration: 30s; }
+.gear:nth-child(4) { animation-duration: 18s; animation-direction: reverse; }
+.gear:nth-child(5) { animation-duration: 22s; }
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .login-box {
   background: var(--card);
+  backdrop-filter: blur(10px);
   padding: 40px 30px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   width: 90%;
   max-width: 380px;
   text-align: center;
   transition: 0.4s;
+  position: relative;
+  z-index: 10;
+  border: 1px solid var(--border);
 }
 .login-box h2 {
   margin-bottom: 25px;
@@ -82,15 +117,31 @@ body {
 }
 .theme-btn {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  background: var(--card);
+  top: 15px;
+  left: 15px;
+  background: var(--input);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 18px;
+  z-index: 11;
+}
+.links {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.links a {
+  text-decoration: none;
+  color: var(--muted);
   font-size: 14px;
+  transition: 0.3s;
+}
+.links a:hover {
+  color: var(--accent);
 }
 .error {
   color: #ff5555;
@@ -101,7 +152,17 @@ body {
 </style>
 </head>
 <body>
-<button class="theme-btn" onclick="toggleTheme()">🌙/☀️</button>
+
+<!-- الخلفية الحية -->
+<div class="gears">
+  <div class="gear" style="top:10%; left:15%;">⚙️</div>
+  <div class="gear" style="top:60%; left:80%; font-size:80px;">⚙️</div>
+  <div class="gear" style="top:30%; left:70%; font-size:40px;">⚙️</div>
+  <div class="gear" style="top:75%; left:20%; font-size:70px;">⚙️</div>
+  <div class="gear" style="top:45%; left:45%; font-size:100px;">⚙️</div>
+</div>
+
+<button class="theme-btn" onclick="toggleTheme()">🌙</button>
 
 <div class="login-box">
   <h2>تسجيل الدخول</h2>
@@ -109,26 +170,39 @@ body {
   <input type="password" id="password" placeholder="كلمة المرور">
   <button onclick="login()">دخول</button>
   <div class="error" id="error"></div>
+
+  <div class="links">
+    <a href="https://wa.me/9647721701620" target="_blank">📱 واتساب 07721701620</a>
+    <a href="https://t.me/j1_ra_2" target="_blank">✈️ تلجرام @j1_ra_2</a>
+    <a href="mailto:ramyaljwyr2@gmail.com">✉️ مراسلة المطور</a>
+  </div>
 </div>
 
 <script>
-// حط مفاتيح Supabase مالك هنا بعدين
 const SUPABASE_URL = 'https://xxxx.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// تبديل الثيم وحفظه
 function toggleTheme() {
   document.body.classList.toggle('light');
-  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-btn');
+  if(document.body.classList.contains('light')) {
+    btn.innerText = '🌙';
+    localStorage.setItem('theme', 'light');
+  } else {
+    btn.innerText = '☀️';
+    localStorage.setItem('theme', 'dark');
+  }
 }
 if(localStorage.getItem('theme') === 'light') {
   document.body.classList.add('light');
+  document.querySelector('.theme-btn').innerText = '🌙';
+} else {
+  document.querySelector('.theme-btn').innerText = '☀️';
 }
 
-// تسجيل الدخول
 async function login() {
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').email;
   const password = document.getElementById('password').value;
   const errorDiv = document.getElementById('error');
   errorDiv.style.display = 'none';
