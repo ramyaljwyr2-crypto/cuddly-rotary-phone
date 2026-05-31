@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الخضرانية لخدمات الإنترنت</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -14,146 +14,79 @@
 --blue:#4a9eff;
 --green:#28a745;
 }
-body.light{
---bg:#f5f5f5;
---card:#fff;
---text:#000;
---blue:#007bff;
-}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
-body{background:var(--bg);color:var(--text);min-height:100vh;transition:0.3s}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:var(--card);border-bottom:2px solid var(--blue)}
-.topbar h2{color:var(--blue)}
-.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
-.btn-blue{background:var(--blue);color:#fff}
-.btn-green{background:var(--green);color:#fff}
-.container{padding:20px;max-width:1200px;margin:auto}
-.login-box{max-width:400px;margin:100px auto;background:var(--card);padding:40px;border-radius:15px;border:2px solid var(--blue)}
-input{width:100%;padding:15px;margin:10px 0;border-radius:8px;border:1px solid #555;background:var(--bg);color:var(--text)}
-.gear{font-size:60px;animation:spin 2s linear infinite;display:inline-block}
+body{background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{max-width:420px;width:90%;background:var(--card);padding:40px 35px;border-radius:20px;border:2px solid var(--blue);box-shadow:0 0 30px rgba(74,158,255,0.4)}
+h1{text-align:center;color:var(--blue);margin-bottom:25px;font-size:26px;font-weight:900}
+input{width:100%;padding:15px;margin:12px 0;border-radius:10px;border:1px solid #555;background:var(--bg);color:var(--text);font-size:16px;transition:0.3s}
+input:focus{border-color:var(--blue);outline:none;box-shadow:0 0 10px rgba(74,158,255,0.3)}
+button{width:100%;padding:16px;background:var(--blue);border:none;border-radius:10px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;transition:0.3s}
+button:hover{background:#007bff;transform:translateY(-2px)}
+button:disabled{opacity:0.6;cursor:not-allowed}
+.gear{font-size:55px;animation:spin 2s linear infinite;text-align:center;margin:15px 0;color:var(--blue)}
 @keyframes spin{100%{transform:rotate(360deg)}}
-.card{background:var(--card);padding:25px;border-radius:15px;margin:20px 0;border:1px solid #333}
+.activate-msg{color:#ffcc00;font-size:15px;text-align:center;margin-top:20px;padding:12px;background:rgba(255,204,0,0.1);border-radius:8px;border:1px solid rgba(255,204,0,0.3)}
+.activate-msg a{color:var(--blue);text-decoration:none;font-weight:bold}
+#msg{text-align:center;margin-top:15px;font-size:14px;min-height:20px}
 .hidden{display:none}
-#msg{text-align:center;margin-top:15px}
 </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
-<div id="loginScreen">
-<div class="login-box">
-<h1 style="text-align:center;color:var(--blue);margin-bottom:20px">الخضرانية لخدمات الإنترنت</h1>
-<input type="email" id="email" placeholder="الايميل">
-<input type="password" id="password" placeholder="كلمة السر">
-<button class="btn btn-blue" id="loginBtn" onclick="login()" style="width:100%">تسجيل الدخول</button>
+<div class="box" id="loginBox">
+<h1>الخضرانية لخدمات الإنترنت</h1>
+
+<div class="gear">⚙️</div>
+
+<input type="email" id="email" placeholder="اليوزر - الايميل">
+<input type="password" id="pass" placeholder="الباسورد">
+
+<div class="activate-msg">
+لتفعيل التطبيق راسل رامي الجوير على واتساب<br>
+<a href="https://wa.me/9647721701620" target="_blank">07721701620</a>
+</div>
+
+<button id="btn" onclick="login()">تسجيل الدخول</button>
 <div id="msg"></div>
-</div>
-</div>
-
-<!-- الشاشة الرئيسية بعد الدخول -->
-<div id="mainScreen" class="hidden">
-<div class="topbar">
-<h2>📊 لوحة التحكم</h2>
-<div>
-<button class="btn" onclick="toggleTheme()">🌙/☀️</button>
-<button class="btn btn-green" onclick="logout()">خروج</button>
-</div>
-</div>
-
-<div class="container">
-<div class="card">
-<h3>الشاشة الحية</h3>
-<div style="text-align:center;margin-top:20px">
-<span class="gear">⚙️</span>
-<p style="margin-top:15px">جاري تحديث البيانات...</p>
-</div>
-</div>
-
-<div class="card">
-<h3>الاحصائيات</h3>
-<p>المشتركين: <span id="count">0</span></p>
-</div>
-</div>
 </div>
 
 <script>
-// المفاتيح مال Supabase
+// مفاتيح Supabase
 const SUPABASE_URL = 'https://jrgfhtwhdlerzpbfstok.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_tbfuzPoX7Sgcry82Y2jCtw_AonRDoPM'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpycWZodHdoZGxtcnpwYmZzdG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzc1NDcsImV4cCI6MjA5NTgxMzU0N30.bFb92I7hWkoYSCb1DVCnEzipxnQvsUCflN-o_inhliI'
+
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-let currentUser = null
-
-// فحص اذا مسجل دخول
-supabase.auth.getSession().then(({data:{session}})=>{
-if(session){
-currentUser = session.user
-showMain()
-loadData()
-}
-})
-
-// تسجيل الدخول
 async function login(){
 const email = document.getElementById('email').value
-const password = document.getElementById('password').value
+const pass = document.getElementById('pass').value
 const msg = document.getElementById('msg')
-const btn = document.getElementById('loginBtn')
+const btn = document.getElementById('btn')
 
-if(!email || !password){
+if(!email || !pass){
 msg.style.color='red'
-msg.textContent='ادخل الايميل والباسورد'
+msg.textContent='⚠️ دخل اليوزر والباسورد'
 return
 }
 
 btn.disabled=true
 btn.textContent='جاري التحقق...'
-msg.textContent=''
+msg.style.color='#4a9eff'
+msg.textContent='انتظر...'
 
-const { data, error } = await supabase.auth.signInWithPassword({email,password})
+const { data, error } = await supabase.auth.signInWithPassword({email,password:pass})
 
 if(error){
 msg.style.color='red'
-msg.textContent='خطأ: '+error.message
+msg.textContent='❌ خطأ: '+error.message
 btn.disabled=false
 btn.textContent='تسجيل الدخول'
 }else{
 msg.style.color='green'
-msg.textContent='تم الدخول بنجاح'
+msg.textContent='✅ تم الدخول بنجاح'
 btn.style.background='green'
-currentUser = data.user
-setTimeout(showMain,800)
-}
-}
-
-function showMain(){
-document.getElementById('loginScreen').classList.add('hidden')
-document.getElementById('mainScreen').classList.remove('hidden')
-}
-
-// تبديل الوضع الرمادي والابيض
-function toggleTheme(){
-document.body.classList.toggle('light')
-localStorage.setItem('theme',document.body.classList.contains('light')?'light':'dark')
-}
-
-// تحميل الثيم المحفوظ
-if(localStorage.getItem('theme')==='light'){
-document.body.classList.add('light')
-}
-
-// تحميل البيانات
-async function loadData(){
-const {data,error} = await supabase.from('subscribers').select('*').eq('user_id',currentUser.id)
-if(!error){
-document.getElementById('count').textContent = data.length
-}
-}
-
-// تسجيل الخروج
-async function logout(){
-await supabase.auth.signOut()
-location.reload()
+btn.textContent='✅ تم بنجاح'
+alert('دخلت ابو علاوي!')
 }
 </script>
 </body>
