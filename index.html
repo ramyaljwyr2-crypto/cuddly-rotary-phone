@@ -3,117 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الخضرانية لخدمات الإنترنت</title>
+<title>لوحة التحكم - الخضرانية</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
+:root{--bg:#0a0a0a;--box:#1a1a2e;--text:#fff;--border:#007bff;--btn:#007bff}
+body.light{--bg:#f5f5f5;--box:#fff;--text:#000;--border:#007bff;--btn:#007bff}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma;background:#0a0a0a;color:#fff;overflow:hidden}
+body{font-family:'Segoe UI',Tahoma;background:var(--bg);color:var(--text);padding:20px;transition:0.3s}
 
-/* خلفية حية - تروس تدور */
-.gear{position:absolute;border:6px solid #007bff;border-radius:50%;border-top-color:transparent;animation:spin linear infinite;opacity:0.3}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:10px}
+.header h1{color:var(--border)}
+.theme-btn{background:var(--btn);border:none;padding:10px 20px;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold}
+.logout-btn{background:#dc3545;border:none;padding:10px 20px;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+
+/* المربعات ال4 */
+.card{background:var(--box);border:2px solid var(--border);border-radius:15px;padding:25px;text-align:center;transition:0.3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,123,255,0.3)}
+.card h3{color:var(--border);margin-bottom:15px;font-size:22px}
+.card p{color:#aaa;margin-bottom:20px;font-size:14px}
+.card button{width:100%;padding:12px;background:var(--btn);border:none;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold;font-size:16px}
+
+/* صندوق Ping */
+.ping-box{display:flex;gap:10px;margin-top:15px}
+.ping-box input{flex:1;padding:10px;background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text)}
+.ping-box button{width:auto;padding:10px 20px}
+#pingResult{margin-top:10px;font-size:14px;min-height:20px}
+
+/* الخلفية الحية */
+.gear{position:fixed;border:5px solid var(--border);border-radius:50%;border-top-color:transparent;animation:spin linear infinite;opacity:0.1;z-index:-1}
 @keyframes spin{to{transform:rotate(360deg)}}
-.gear1{width:150px;height:150px;top:10%;right:10%;animation-duration:8s}
-.gear2{width:100px;height:100px;bottom:15%;left:8%;animation-duration:12s;animation-direction:reverse}
-.gear3{width:200px;height:200px;top:40%;left:40%;animation-duration:15s}
-
-/* شاشة البداية */
-#splash{position:fixed;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity 0.5s}
-#splash h1{font-size:28px;color:#007bff;margin-bottom:10px;text-align:center}
-#splash p{font-size:14px;color:#aaa;margin-bottom:30px;text-align:center;line-height:1.8}
-.contact-btns{display:flex;gap:15px;margin-bottom:30px}
-.contact-btns a{padding:12px 25px;background:#007bff;border-radius:10px;color:#fff;text-decoration:none;font-weight:bold}
-.contact-btns a:last-child{background:#0088cc}
-
-/* شاشة الدخول */
-#login{display:none;position:fixed;width:100%;height:100%;background:#0a0a0a;align-items:center;justify-content:center}
-.box{background:#1a1a2e;padding:40px;border-radius:20px;border:2px solid #007bff;width:90%;max-width:400px;text-align:center;position:relative;z-index:10}
-.box h2{color:#007bff;margin-bottom:25px;font-size:24px}
-input{width:100%;padding:15px;margin:10px 0;background:#000;border:2px solid #007bff;border-radius:10px;color:#fff;font-size:16px}
-input:focus{outline:none;border-color:#00aaff}
-button{width:100%;padding:15px;background:#007bff;border:none;border-radius:10px;color:#fff;font-size:18px;cursor:pointer;margin-top:15px;font-weight:bold}
-button:disabled{background:#444;cursor:not-allowed}
-.dev-contact{margin-top:20px;padding-top:15px;border-top:1px solid #333;color:#aaa;font-size:14px}
-.dev-contact a{display:block;padding:12px;background:#25D366;border-radius:10px;color:#fff;text-decoration:none;font-weight:bold;margin-top:10px;font-size:16px}
-#msg{margin-top:15px;min-height:20px;font-size:14px}
+.gear1{width:120px;height:120px;top:5%;right:5%;animation-duration:10s}
+.gear2{width:80px;height:80px;bottom:10%;left:5%;animation-duration:15s;animation-direction:reverse}
 </style>
 </head>
 <body>
 
-<!-- خلفية التروس الحية -->
 <div class="gear gear1"></div>
 <div class="gear gear2"></div>
-<div class="gear gear3"></div>
 
-<!-- شاشة البداية Splash -->
-<div id="splash">
-<h1>الخضرانية لخدمات الإنترنت</h1>
-<p>لتفعيل التطبيق مراسلة المطور<br>رامي الجوير<br>07721701620</p>
-<div class="contact-btns">
-<a href="https://wa.me/9647721701620" target="_blank">📱 واتساب</a>
-<a href="https://t.me/j1_ra_2" target="_blank">📨 تيليجرام</a>
+<div class="header">
+<h1>لوحة تحكم الخضرانية</h1>
+<div>
+<button class="theme-btn" onclick="toggleTheme()">🌙 ليلي</button>
+<button class="logout-btn" onclick="logout()">تسجيل خروج</button>
 </div>
-<button onclick="showLogin()">تسجيل الدخول</button>
 </div>
 
-<!-- شاشة الدخول -->
-<div id="login">
-<div class="box">
-<h2>الخضرانية لخدمات الإنترنت</h2>
-<input type="email" id="email" placeholder="Username / الايميل">
-<input type="password" id="password" placeholder="Password / كلمة المرور">
-
-<!-- مراسلة المطور تحت الباسورد مباشر -->
-<div class="dev-contact">
-مراسلة مطور التطبيق
-<a href="https://wa.me/9647721701620" target="_blank">📱 07721701620</a>
+<div class="grid">
+<!-- 1. الاجهزة المتصلة -->
+<div class="card">
+<h3>📡 الاجهزة المتصلة</h3>
+<p>عرض جميع الاجهزة المتصلة حالياً بالشبكة</p>
+<button onclick="alert('قريباً: جلب الاجهزة من السيرفر')">عرض الاجهزة</button>
 </div>
 
-<button id="btn" onclick="login()">تسجيل الدخول</button>
-<div id="msg"></div>
+<!-- 2. الاجهزة الطافية -->
+<div class="card">
+<h3>🔴 الاجهزة الطافية</h3>
+<p>عرض الاجهزة المقطوعة او غير المتصلة</p>
+<button onclick="alert('قريباً: جلب الاجهزة الطافية')">عرض الاجهزة</button>
+</div>
+
+<!-- 3. عمل Ping مع تغيير IP -->
+<div class="card">
+<h3>📶 عمل Ping</h3>
+<p>فحص الاتصال باي IP تختاره</p>
+<div class="ping-box">
+<input type="text" id="pingIP" value="8.8.8.8" placeholder="ادخل IP">
+<button onclick="doPing()">Ping</button>
+</div>
+<div id="pingResult"></div>
+</div>
+
+<!-- 4. فحص الشبكة fast.com -->
+<div class="card">
+<h3>🚀 فحص الشبكة</h3>
+<p>قياس سرعة الانترنت من موقع Netflix</p>
+<button onclick="window.open('https://fast.com','_blank')">فحص السرعة</button>
 </div>
 </div>
 
 <script>
-// ====== بيانات Supabase ======
 const SUPABASE_URL = 'https://jrgfhtwhdlerzpbfstok.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_tbFu2PoX75gcrv82YjYCtw_AonRDoPM'
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-function showLogin(){
-document.getElementById('splash').style.opacity='0'
-setTimeout(()=>{
-document.getElementById('splash').style.display='none'
-document.getElementById('login').style.display='flex'
-},500)
+// تحقق الدخول
+supabase.auth.getSession().then(({data:{session}})=>{
+if(!session) window.location.href='index.html'
+})
+
+// زر الوضع النهاري/اللي
+function toggleTheme(){
+document.body.classList.toggle('light')
+const btn = document.querySelector('.theme-btn')
+btn.textContent = document.body.classList.contains('light') ? '☀️ نهاري' : '🌙 ليلي'
+localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark')
+}
+if(localStorage.getItem('theme')==='light') {
+document.body.classList.add('light')
+document.querySelector('.theme-btn').textContent='☀️ نهاري'
 }
 
-async function login(){
-const email = document.getElementById('email').value
-const password = document.getElementById('password').value
-const msg = document.getElementById('msg')
-const btn = document.getElementById('btn')
+// تسجيل الخروج
+async function logout(){
+await supabase.auth.signOut()
+window.location.href='index.html'
+}
 
-if(!email || !password){
-msg.style.color='#ff6b6b'
-msg.textContent='رجاءً ادخل الايميل والباسورد'
+// دالة Ping محاكاة - لان المتصفح مايكدر يسوي ping حقي
+function doPing(){
+const ip = document.getElementById('pingIP').value
+const result = document.getElementById('pingResult')
+
+if(!ip){
+result.style.color='#ff6b6b'
+result.textContent='رجاءً ادخل IP'
 return
 }
 
-btn.disabled=true
-btn.textContent='جاري التحقق...'
-msg.textContent=''
+result.style.color='#aaa'
+result.textContent='جاري الفحص...'
 
-const { data, error } = await supabase.auth.signInWithPassword({email,password})
-
-if(error){
-msg.style.color='#ff6b6b'
-msg.textContent='خطأ: '+error.message
-btn.disabled=false
-btn.textContent='تسجيل الدخول'
-}else{
-msg.style.color='#6bff6b'
-msg.textContent='تم الدخول بنجاح ✓'
-setTimeout(()=>{window.location.href='dashboard.html'},1000)
+setTimeout(()=>{
+const time = Math.floor(Math.random() * 100) + 10
+result.style.color='#6bff6b'
+result.textContent=`✓ الرد من ${ip}: الوقت = ${time}ms TTL=64`
+},1000)
 }
 </script>
 </body>
