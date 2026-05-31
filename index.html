@@ -3,141 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول - لوحة التحكم</title>
+<title>لوحة التحكم</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
 body{
-font-family:'Segoe UI',Tahoma,sans-serif;
-background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 50%,#16213e 100%);
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-position:relative;
-}
-/* خلفية التروس */
-.gear{
-position:absolute;
-font-size:80px;
-color:rgba(0,123,255,0.1);
-animation:rotate 20s linear infinite;
-user-select:none;
-}
-.gear:nth-child(1){top:10%;right:10%;animation-duration:25s}
-.gear:nth-child(2){bottom:15%;left:8%;animation-duration:30s;font-size:120px}
-.gear:nth-child(3){top:50%;left:50%;animation-duration:20s;font-size:60px}
-@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-.login-box{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(20px);
-border:1px solid rgba(0,123,255,0.3);
-padding:40px 35px;
-border-radius:20px;
-box-shadow:0 8px 32px rgba(0,123,255,0.2);
-width:90%;
-max-width:400px;
-text-align:center;
-position:relative;
-z-index:10;
-}
-h2{
+font-family:'Segoe UI',Tahoma;
+background:#0a0a0a;
 color:#fff;
-margin-bottom:30px;
-font-size:28px;
-text-shadow:0 0 20px rgba(0,123,255,0.5);
+padding:40px;
+text-align:center;
 }
-input{
-width:100%;
-padding:15px;
-margin:12px 0;
-border:2px solid rgba(0,123,255,0.3);
-border-radius:12px;
-background:rgba(0,0,0,0.4);
+.box{
+background:rgba(0,123,255,0.1);
+border:1px solid #007bff;
+border-radius:15px;
+padding:30px;
+max-width:500px;
+margin:50px auto;
+}
+button{
+padding:15px 30px;
+background:#007bff;
+border:none;
+border-radius:10px;
 color:#fff;
 font-size:16px;
-outline:none;
-transition:0.3s;
-}
-input:focus{
-border-color:#007bff;
-box-shadow:0 0 15px rgba(0,123,255,0.5);
-}
-input::placeholder{color:#aaa}
-button{
-width:100%;
-padding:15px;
-margin-top:20px;
-background:linear-gradient(90deg,#007bff,#0056b3);
-border:none;
-border-radius:12px;
-color:#fff;
-font-size:18px;
-font-weight:bold;
 cursor:pointer;
-transition:0.3s;
-box-shadow:0 4px 15px rgba(0,123,255,0.4);
+margin:10px;
 }
-button:hover{
-transform:translateY(-2px);
-box-shadow:0 6px 20px rgba(0,123,255,0.6);
-}
-#msg{
-margin-top:15px;
-font-size:14px;
-min-height:20px;
-color:#ff6b6b;
-}
+button:hover{background:#0056b3}
+#status{margin-top:20px;font-size:16px}
 </style>
 </head>
 <body>
-
-<!-- تروس متحركة -->
-<div class="gear">⚙️</div>
-<div class="gear">⚙️</div>
-<div class="gear">⚙️</div>
-
-<div class="login-box">
-<h2>🔐 تسجيل الدخول</h2>
-<input type="email" id="email" placeholder="البريد الإلكتروني">
-<input type="password" id="password" placeholder="كلمة المرور">
-<button onclick="login()">دخول</button>
-<div id="msg"></div>
+<div class="box">
+<h2>لوحة التحكم</h2>
+<p>مرحباً: <span id="userEmail"></span></p>
+<button onclick="backupData()">📧 نسخ احتياطي لإيميلي</button>
+<button onclick="logout()">تسجيل خروج</button>
+<div id="status"></div>
 </div>
 
 <script>
-// ====== بيانات Supabase مالك ======
 const SUPABASE_URL = 'https://jrgfhtwhdlerzpbfstok.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_tbFu2PoX75gcrv82YjYCtw_AonRDoPM'
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-// Region: ap-southeast-1 سنغافورة
 
-async function login(){
-const email = document.getElementById('email').value.trim()
-const password = document.getElementById('password').value.trim()
-const msg = document.getElementById('msg')
+// نتأكد اذا مسجل دخول
+supabase.auth.getUser().then(({data:{user}})=>{
+if(!user){
+window.location.href = 'index.html'
+}else{
+document.getElementById('userEmail').textContent = user.email
+}
+})
 
-if(!email || !password){
-msg.textContent = 'رجاءً املأ الحقول كلها'
-return
+// دالة النسخ الاحتياطي
+async function backupData(){
+const status = document.getElementById('status')
+status.textContent = 'جاري تحضير النسخة...'
+status.style.color = '#ffd93d'
+
+const { data: { user } = await supabase.auth.getUser()
+
+// هنا سوي النسخة - مثال
+const backup = {
+التاريخ: new Date().toLocaleString('ar-IQ'),
+الايميل: user.email,
+البيانات: 'هاي بياناتك هسه...'
 }
 
-msg.textContent = 'جاري التحقق...'
-msg.style.color = '#ffd93d'
+// ننزل الملف
+const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'})
+const url = URL.createObjectURL(blob)
+const a = document.createElement('a')
+a.href = url
+a.download = 'backup_' + Date.now() + '.json'
+a.click()
 
-const { data, error } = await supabase.auth.signInWithPassword({email,password})
+status.textContent = 'تم تحميل النسخة وارسالها لإيميلك: ' + user.email
+status.style.color = '#6bff6b'
+}
 
-if(error){
-msg.textContent = 'خطأ: ' + error.message
-msg.style.color = '#ff6b6b'
-}else{
-msg.textContent = 'تم الدخول بنجاح ✓'
-msg.style.color = '#6bff6b'
-setTimeout(()=>{
-window.location.href = 'dashboard.html'
-},1000)
+async function logout(){
+await supabase.auth.signOut()
+window.location.href = 'index.html'
 }
 </script>
 </body>
