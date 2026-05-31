@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الخضرانية لخدمات الإنترنت</title>
+<title>نظام الخضرانية</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
@@ -11,10 +11,8 @@
   --bg2: #181818;
   --card: rgba(34,34,34,0.85);
   --text: #eee;
-  --input: rgba(42,42,42,0.9);
   --border: #444;
   --accent: #4a90e2;
-  --muted: #aaa;
 }
 
 body.light {
@@ -22,24 +20,19 @@ body.light {
   --bg2: #ffffff;
   --card: rgba(255,255,255,0.9);
   --text: #111;
-  --input: rgba(245,245,245,0.9);
   --border: #ddd;
   --accent: #0077ff;
-  --muted: #666;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo', sans-serif; }
 body {
   min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   color: var(--text);
   overflow: hidden;
   position: relative;
 }
 
-/* الخلفية الحية بعجلات الضبط */
+/* العجلات تفتر بالخلفية */
 .gears {
   position: fixed;
   top: 0;
@@ -57,69 +50,101 @@ body {
   opacity: 0.15;
   animation: rotate 20s linear infinite;
 }
-.gear:nth-child(2) { animation-duration: 25s; animation-direction: reverse; }
-.gear:nth-child(3) { animation-duration: 30s; }
-.gear:nth-child(4) { animation-duration: 18s; animation-direction: reverse; }
-.gear:nth-child(5) { animation-duration: 22s; }
+.gear:nth-child(2) { animation-duration: 25s; animation-direction: reverse; top:60%; left:80%; font-size:80px; }
+.gear:nth-child(3) { animation-duration: 30s; top:30%; left:70%; font-size:40px; }
+.gear:nth-child(4) { animation-duration: 18s; animation-direction: reverse; top:75%; left:20%; font-size:70px; }
+.gear:nth-child(5) { animation-duration: 22s; top:45%; left:45%; font-size:100px; }
 
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-.login-box {
-  background: var(--card);
-  backdrop-filter: blur(10px);
-  padding: 40px 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  width: 90%;
-  max-width: 380px;
-  text-align: center;
-  transition: 0.4s;
+/* الكونتينر */
+.container {
   position: relative;
   z-index: 10;
-  border: 1px solid var(--border);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
-.login-box h2 {
-  margin-bottom: 25px;
+
+.box {
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+h2 {
+  text-align: center;
   color: var(--accent);
+  margin-bottom: 30px;
+  font-size: 28px;
 }
-.login-box input {
+
+input {
   width: 100%;
-  padding: 14px;
-  margin: 12px 0;
+  padding: 12px;
+  margin: 10px 0;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--input);
+  border-radius: 8px;
+  background: var(--bg1);
   color: var(--text);
-  outline: none;
   font-size: 16px;
-  transition: 0.3s;
 }
-.login-box input:focus {
-  border-color: var(--accent);
-}
-.login-box button {
+
+button {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   margin-top: 15px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--accent);
   color: #fff;
-  font-size: 17px;
+  font-size: 18px;
   cursor: pointer;
   transition: 0.3s;
 }
-.login-box button:hover {
-  opacity: 0.9;
+button:hover { opacity: 0.9; }
+
+.error {
+  color: #ff5555;
+  text-align: center;
+  margin-top: 10px;
+  display: none;
 }
+
+/* صفحة الضبط */
+.dashboard {
+  display: none;
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+
 .theme-btn {
-  position: absolute;
+  position: fixed;
   top: 15px;
   left: 15px;
-  background: var(--input);
+  background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 8px 12px;
@@ -128,61 +153,65 @@ body {
   font-size: 18px;
   z-index: 11;
 }
-.links {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.links a {
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 14px;
-  transition: 0.3s;
-}
-.links a:hover {
-  color: var(--accent);
-}
-.error {
-  color: #ff5555;
-  font-size: 14px;
-  margin-top: 10px;
-  display: none;
-}
+
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- الخلفية الحية -->
 <div class="gears">
   <div class="gear" style="top:10%; left:15%;">⚙️</div>
-  <div class="gear" style="top:60%; left:80%; font-size:80px;">⚙️</div>
-  <div class="gear" style="top:30%; left:70%; font-size:40px;">⚙️</div>
-  <div class="gear" style="top:75%; left:20%; font-size:70px;">⚙️</div>
-  <div class="gear" style="top:45%; left:45%; font-size:100px;">⚙️</div>
+  <div class="gear">⚙️</div>
+  <div class="gear">⚙️</div>
+  <div class="gear">⚙️</div>
+  <div class="gear">⚙️</div>
 </div>
 
 <button class="theme-btn" onclick="toggleTheme()">🌙</button>
 
-<div class="login-box">
-  <h2>تسجيل الدخول</h2>
-  <input type="email" id="email" placeholder="الإيميل">
-  <input type="password" id="password" placeholder="كلمة المرور">
-  <button onclick="login()">دخول</button>
-  <div class="error" id="error"></div>
+<!-- صفحة الدخول -->
+<div class="container" id="loginPage">
+  <div class="box">
+    <h2>تسجيل الدخول</h2>
+    <input type="email" id="email" placeholder="الايميل" required>
+    <input type="password" id="password" placeholder="كلمة المرور" required>
+    <button onclick="login()">دخول</button>
+    <div class="error" id="error"></div>
+  </div>
+</div>
 
-  <div class="links">
-    <a href="https://wa.me/9647721701620" target="_blank">📱 واتساب 07721701620</a>
-    <a href="https://t.me/j1_ra_2" target="_blank">✈️ تلجرام @j1_ra_2</a>
-    <a href="mailto:ramyaljwyr2@gmail.com">✉️ مراسلة المطور</a>
+<!-- صفحة الضبط -->
+<div class="dashboard" id="dashboardPage">
+  <div class="header">
+    <h2>مرحباً بك في لوحة التحكم</h2>
+    <button onclick="logout()">خروج</button>
+  </div>
+  
+  <div class="box" style="max-width: 900px;">
+    <h3 style="color: var(--accent); margin-bottom: 20px;">الضبط العام</h3>
+    <p>هنا تقدر تضيف الروابط والاعدادات مال تطبيقك</p>
+    <br>
+    <input type="text" placeholder="رابط الواتساب">
+    <input type="text" placeholder="رابط التليجرام">
+    <input type="text" placeholder="الايميل الرسمي">
+    <button>حفظ التغييرات</button>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://xxxx.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+// === حط مفاتيح Supabase مالك هنا ===
+const SUPABASE_URL = 'https://jqfhtwhdlmrzpbfstok.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_tbfuzPoX7Sgcry82Y2jCtw_AonRDoPM'
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
+// التحقق اذا مسجل دخول
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    showDashboard();
+  }
+})
+
+// تبديل الثيم
 function toggleTheme() {
   document.body.classList.toggle('light');
   const btn = document.querySelector('.theme-btn');
@@ -197,24 +226,36 @@ function toggleTheme() {
 if(localStorage.getItem('theme') === 'light') {
   document.body.classList.add('light');
   document.querySelector('.theme-btn').innerText = '🌙';
-} else {
-  document.querySelector('.theme-btn').innerText = '☀️';
 }
 
+// تسجيل الدخول
 async function login() {
-  const email = document.getElementById('email').email;
+  const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorDiv = document.getElementById('error');
   errorDiv.style.display = 'none';
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  
+
   if(error) {
-    errorDiv.innerText = 'الإيميل أو كلمة المرور غلط';
+    errorDiv.innerText = 'الايميل أو كلمة المرور غلط';
     errorDiv.style.display = 'block';
   } else {
-    window.location.href = 'dashboard.html';
+    showDashboard();
   }
+}
+
+// عرض الضبط
+function showDashboard() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('dashboardPage').style.display = 'block';
+}
+
+// تسجيل الخروج
+async function logout() {
+  await supabase.auth.signOut();
+  document.getElementById('dashboardPage').style.display = 'none';
+  document.getElementById('loginPage').classList.remove('hidden');
 }
 </script>
 </body>
