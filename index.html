@@ -7,18 +7,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{
---bg:#0a0a0a;
---card:#1a1a1a;
---text:#fff;
---blue:#4a9eff;
---green:#28a745;
-}
+:root{--bg:#0a0a0a;--card:#1a1a1a;--text:#fff;--blue:#4a9eff;--green:#28a745}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
 body{background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center}
 .box{max-width:420px;width:90%;background:var(--card);padding:40px 35px;border-radius:20px;border:2px solid var(--blue);box-shadow:0 0 30px rgba(74,158,255,0.4)}
 h1{text-align:center;color:var(--blue);margin-bottom:25px;font-size:26px;font-weight:900}
-input{width:100%;padding:15px;margin:12px 0;border-radius:10px;border:1px solid #555;background:var(--bg);color:var(--text);font-size:16px;transition:0.3s}
+input{width:100%;padding:15px;margin:12px 0;border-radius:10px;border:1px solid #555;background:var(--bg);color:var(--text);font-size:16px}
 input:focus{border-color:var(--blue);outline:none;box-shadow:0 0 10px rgba(74,158,255,0.3)}
 button{width:100%;padding:16px;background:var(--blue);border:none;border-radius:10px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;transition:0.3s}
 button:hover{background:#007bff;transform:translateY(-2px)}
@@ -28,31 +22,26 @@ button:disabled{opacity:0.6;cursor:not-allowed}
 .activate-msg{color:#ffcc00;font-size:15px;text-align:center;margin-top:20px;padding:12px;background:rgba(255,204,0,0.1);border-radius:8px;border:1px solid rgba(255,204,0,0.3)}
 .activate-msg a{color:var(--blue);text-decoration:none;font-weight:bold}
 #msg{text-align:center;margin-top:15px;font-size:14px;min-height:20px}
-.hidden{display:none}
 </style>
 </head>
 <body>
 
 <div class="box" id="loginBox">
 <h1>الخضرانية لخدمات الإنترنت</h1>
-
 <div class="gear">⚙️</div>
-
 <input type="email" id="email" placeholder="اليوزر - الايميل">
 <input type="password" id="pass" placeholder="الباسورد">
-
 <div class="activate-msg">
 لتفعيل التطبيق راسل رامي الجوير على واتساب<br>
 <a href="https://wa.me/9647721701620" target="_blank">07721701620</a>
 </div>
-
 <button id="btn" onclick="login()">تسجيل الدخول</button>
 <div id="msg"></div>
 </div>
 
 <script>
-// مفاتيح Supabase
-const SUPABASE_URL = 'https://jrgfhtwhdlerzpbfstok.supabase.co'
+// مفاتيح Supabase مال مشروعك
+const SUPABASE_URL = 'https://jrgfhtwhdlmrzpbfstok.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpycWZodHdoZGxtcnpwYmZzdG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzc1NDcsImV4cCI6MjA5NTgxMzU0N30.bFb92I7hWkoYSCb1DVCnEzipxnQvsUCflN-o_inhliI'
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -86,7 +75,8 @@ msg.style.color='green'
 msg.textContent='✅ تم الدخول بنجاح'
 btn.style.background='green'
 btn.textContent='✅ تم بنجاح'
-alert('دخلت ابو علاوي!')
+// بعد ثانيتين يحولك للداشبورد
+setTimeout(()=>{window.location='dashboard.html'},1500)
 }
 </script>
 </body>
